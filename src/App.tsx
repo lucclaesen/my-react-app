@@ -1,26 +1,46 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import ResizablePane from "./ResizablePane"
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+type State = {
+  propagateMouseMoves: boolean;
+  clientX: number;
 }
 
-export default App;
+export default class App extends React.Component<{}, State> {
+
+  readonly state = { 
+    propagateMouseMoves: false,
+    clientX: 500
+  };
+
+  render() {
+    return (
+      <div id="app" 
+        onMouseMove={this.onMouseMove} 
+        onMouseUp={() => this.propagateMouseMoves(false)}>
+        
+        <ResizablePane 
+            propagateMouseMoves={this.propagateMouseMoves}
+            clientX = {this.state.clientX}
+            />
+      
+      </div>
+    );  
+  }
+
+  onMouseMove = (ev: React.MouseEvent) => {
+    if (this.state.propagateMouseMoves) {
+      const clientX = ev.clientX;
+      this.setState((currentState) => ({
+        ...currentState,
+        clientX
+      }));
+    }
+  };
+
+  propagateMouseMoves = (ev: boolean) => {
+    console.log(`About to ${ev? "start" : "stop"} following the mouse position.`);
+    this.setState(() => ({propagateMouseMoves: ev}));
+  }
+}
